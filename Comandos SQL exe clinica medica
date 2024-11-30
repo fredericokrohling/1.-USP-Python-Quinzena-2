@@ -1,0 +1,197 @@
+--Exercicio clinica medica
+
+select * from clinica_medica_t_convenios;
+select * from clinica_medica_t_exames;
+select * from clinica_medica_t_clientes;
+select * from clinica_medica_t_exame_clientes;
+
+--DROP TABLE mba_usp.clinica_medica_t_clientes;
+commit;
+
+CREATE SEQUENCE s_cod_convenios 
+    MINVALUE 100
+    MAXVALUE 999
+    START WITH 100
+    INCREMENT BY 1
+    CACHE 10;
+
+
+CREATE TABLE clinica_medica_t_convenios(
+    id_cod_convenio integer PRIMARY KEY,
+    cnpj_convenio number(14) not null,
+    nome_convenio char(40) not null,
+    nome_resp_conv char(40) not null,
+    tel_resp_conv char(11),
+    
+    CONSTRAINT cons_nome_convenio unique(nome_convenio),
+    CONSTRAINT cons_cnpj_convenio unique(cnpj_convenio)
+);
+   
+CREATE TABLE clinica_medica_t_exames(
+    id_cod_exame number(4) PRIMARY KEY,
+    tipo_exame char(15) not null,
+    
+    CONSTRAINT cons_tipo_exame CHECK(tipo_exame in('sangue','imagem','urina',
+    'eletro','biopsia'))
+);    
+
+CREATE TABLE clinica_medica_t_clientes(
+    id_cliente char(11) PRIMARY KEY,
+    nome char(40) not null,
+    telefone char(11),
+    endereco char(40),
+    id_cod_convenio number(3),
+    
+    CONSTRAINT cons_un_nome unique(nome),
+    CONSTRAINT fk_id_cod_convenio FOREIGN KEY (id_cod_convenio) 
+    REFERENCES clinica_medica_t_convenios(id_cod_convenio) ON DELETE CASCADE
+);
+
+CREATE TABLE clinica_medica_t_exame_clientes(
+    id_cod_exame number(4) not null,
+    id_cliente char(11) not null,
+    diagnostico_exame_exame char(100) not null,
+    data_exame date,
+        
+    CONSTRAINT cons_id_cod_exame_fk FOREIGN KEY (id_cod_exame)
+    REFERENCES clinica_medica_t_exames(id_cod_exame) ON DELETE CASCADE,
+    CONSTRAINT cons_id_cliente_fk FOREIGN KEY (id_cliente) 
+    REFERENCES clinica_medica_t_clientes(id_cliente) ON DELETE CASCADE
+);
+
+     
+    
+    INSERT ALL   
+        INTO clinica_medica_t_convenios(id_cod_convenio, cnpj_convenio, nome_convenio, nome_resp_conv, tel_resp_conv) 
+        VALUES(s_cod_convenios.nextval,74566320001133,'Hapvida','Zeca Soares','312237702')
+        SELECT * FROM dual;
+    
+    INSERT ALL  
+        INTO clinica_medica_t_convenios(id_cod_convenio, cnpj_convenio, nome_convenio, nome_resp_conv, tel_resp_conv) 
+        VALUES(s_cod_convenios.nextval,10239980001754,'Bradesco Saude','Josenilton de Paula','217107844')
+        SELECT * FROM dual;
+    
+    INSERT ALL  
+        INTO clinica_medica_t_convenios(id_cod_convenio, cnpj_convenio, nome_convenio, nome_resp_conv, tel_resp_conv) 
+        VALUES(s_cod_convenios.nextval,45789910001221,'Unimed-BH','Fernanda Assumpcao','31984040686')
+        SELECT * FROM dual;
+    
+    INSERT ALL
+        INTO clinica_medica_t_convenios(id_cod_convenio, cnpj_convenio, nome_convenio, nome_resp_conv, tel_resp_conv) 
+        VALUES(s_cod_convenios.nextval,36521420001448,'MedCenter','Johnson Torres','31991356900')
+        SELECT * FROM dual;
+
+INSERT ALL -- T_clientes
+    INTO clinica_medica_t_clientes(id_cliente, nome, telefone, endereco, id_cod_convenio)
+    VALUES ('04098916657','Amanda Rios','3142177389','Avenida Afonso Pena, 155',108)
+    INTO clinica_medica_t_clientes(id_cliente, nome, telefone, endereco, id_cod_convenio)
+    VALUES('05632147747','Ricardo Nunes','3154563267','Rua Maranhao, 10',110)
+    INTO clinica_medica_t_clientes(id_cliente, nome, telefone, endereco, id_cod_convenio)
+    VALUES('12336547898','Jose dos Santos Rico','3177412081','Rua Samuel Pereira, 164',111)
+    INTO clinica_medica_t_clientes(id_cliente, nome, telefone, endereco, id_cod_convenio)
+    VALUES('78741452368','Paulo Motta','3189877457','Avcenida do Contorno, 2050',112)
+    INTO clinica_medica_t_clientes(id_cliente, nome, telefone, endereco, id_cod_convenio)
+    VALUES('01255478745','Auxiliadora da Silva','3141217789','Rua Desembargador Pedro Licinio, 40',108)
+    INTO clinica_medica_t_clientes(id_cliente, nome, telefone, endereco, id_cod_convenio)
+    VALUES('63654598741','Tatiana Bisura','3141217789','Rua da Passagem, 76',110)
+    INTO clinica_medica_t_clientes(id_cliente, nome, telefone, endereco, id_cod_convenio)
+    VALUES('33652012104','Erasmo Carlos','3141217789','Rua Holanda Lima, 189',111)
+    INTO clinica_medica_t_clientes(id_cliente, nome, telefone, endereco, id_cod_convenio)
+    VALUES('77475896320','Joanna Fohm','3141217789','Avenida Getulio Vargas, 1955',112)
+    INTO clinica_medica_t_clientes(id_cliente, nome, telefone, endereco, id_cod_convenio)
+    VALUES('22365250147','Euripedes Casera','3141217789','Rua Darcy Ribeiro, 300',108)
+SELECT * FROM dual;
+    
+INSERT ALL -- T_exames
+    INTO clinica_medica_t_exames (id_cod_exame, tipo_exame) VALUES (223, 'sangue')
+    INTO clinica_medica_t_exames (id_cod_exame, tipo_exame) VALUES(225, 'urina')
+    INTO clinica_medica_t_exames (id_cod_exame, tipo_exame) VALUES(309, 'imagem')
+    INTO clinica_medica_t_exames (id_cod_exame, tipo_exame) VALUES(425, 'eletro')
+    INTO clinica_medica_t_exames (id_cod_exame, tipo_exame) VALUES(600, 'biopsia')
+SELECT * FROM dual;
+    
+INSERT ALL -- T_exame_cliente
+    INTO clinica_medica_t_exame_clientes(id_cliente, id_cod_exame, data_exame, diagnostico_exame)
+    VALUES('04098916657',223,TO_DATE('05/01/2023 10:15:00','DD/MM/YYYY HH24:MI:SS'), 'Exame dentro dos parametros de normalidde.')
+    INTO clinica_medica_t_exame_clientes(id_cliente, id_cod_exame, data_exame, diagnostico_exame)
+    VALUES('04098916657',225,TO_DATE('05/01/2023 10:15:00','DD/MM/YYYY HH24:MI:SS'),'Urina apresenta nivel elevado de ureia')
+    INTO clinica_medica_t_exame_clientes(id_cliente, id_cod_exame, data_exame, diagnostico_exame)
+    VALUES('04098916657',309,TO_DATE('05/01/2023 10:15:00','DD/MM/YYYY HH24:MI:SS'),'Lesão identificada no menisco')
+    INTO clinica_medica_t_exame_clientes(id_cliente, id_cod_exame, data_exame, diagnostico_exame)
+    VALUES('05632147747',425,TO_DATE('05/01/2023 10:15:00','DD/MM/YYYY HH24:MI:SS'),'Altercao no ritmo cardiaco identificada apos exercicios fisicos na esteira')
+    INTO clinica_medica_t_exame_clientes(id_cliente, id_cod_exame, data_exame, diagnostico_exame)
+    VALUES('05632147747',600,TO_DATE('05/01/2023 10:15:00','DD/MM/YYYY HH24:MI:SS'),'Nenhuma alteracao celular identificada na biopsia')
+    INTO clinica_medica_t_exame_clientes(id_cliente, id_cod_exame, data_exame, diagnostico_exame)
+    VALUES('12336547898',223,TO_DATE('09/01/2024 09:01:53','DD/MM/YYYY HH24:MI:SS'),'Numero de hemacias 10% acima do valor padrão')
+    INTO clinica_medica_t_exame_clientes(id_cliente, id_cod_exame, data_exame, diagnostico_exame)
+    VALUES('78741452368',225,TO_DATE('19/02/2024 16:55:01','DD/MM/YYYY HH24:MI:SS'),'Urina sem alterações identificadas')
+    INTO clinica_medica_t_exame_clientes(id_cliente, id_cod_exame, data_exame, diagnostico_exame)
+    VALUES('78741452368',309,TO_DATE('11/03/2024 13:13:20','DD/MM/YYYY HH24:MI:SS'),'Nenhuma lesao identificada')
+    INTO clinica_medica_t_exame_clientes(id_cliente, id_cod_exame, data_exame, diagnostico_exame)
+    VALUES('78741452368',425,TO_DATE('11/03/2024 17:26:20','DD/MM/YYYY HH24:MI:SS'),'Batimentos cardiacos normais')
+    INTO clinica_medica_t_exame_clientes(id_cliente, id_cod_exame, data_exame, diagnostico_exame)
+    VALUES('78741452368',600,TO_DATE('04/09/2021 07:55:14','DD/MM/YYYY HH24:MI:SS'),'Tecido necrosado, recomenda-se extracao')
+    INTO clinica_medica_t_exame_clientes(id_cliente, id_cod_exame, data_exame, diagnostico_exame)
+    VALUES('01255478745',223,TO_DATE('13/04/2023 08:21:21','DD/MM/YYYY HH24:MI:SS'),'Nível de leucócitos 35% acima do padrão')
+    INTO clinica_medica_t_exame_clientes(id_cliente, id_cod_exame, data_exame, diagnostico_exame)
+    VALUES('01255478745',225,TO_DATE('19/05/2022 11:59:02','DD/MM/YYYY HH24:MI:SS'),'Infecçao bacteriana - estratocopus pujantis')
+    INTO clinica_medica_t_exame_clientes(id_cliente, id_cod_exame, data_exame, diagnostico_exame)
+    VALUES('63654598741',309,TO_DATE('23/07/2023 13:21:44','DD/MM/YYYY HH24:MI:SS'),'Inflamação no tendão de aquiles - grau 2')
+    INTO clinica_medica_t_exame_clientes(id_cliente, id_cod_exame, data_exame, diagnostico_exame)
+    VALUES('05632147747',425,TO_DATE('08/11/2024 10:00:00','DD/MM/YYYY HH24:MI:SS'),'Disritmia cardiaca grave')
+    INTO clinica_medica_t_exame_clientes(id_cliente, id_cod_exame, data_exame, diagnostico_exame)
+    VALUES('05632147747',600,TO_DATE('08/11/2024 15:18:09','DD/MM/YYYY HH24:MI:SS'),'Tecido apresenta tumor benigno')
+    INTO clinica_medica_t_exame_clientes(id_cliente, id_cod_exame, data_exame, diagnostico_exame)
+    VALUES('63654598741',223,TO_DATE('24/02/2023 12:49:30','DD/MM/YYYY HH24:MI:SS'),'Sangue do tipo B+, sem anormalidades identificadas')
+    INTO clinica_medica_t_exame_clientes(id_cliente, id_cod_exame, data_exame, diagnostico_exame)
+    VALUES('63654598741',225,TO_DATE('24/02/2023 12:49:00','DD/MM/YYYY HH24:MI:SS'),'Nivel de acidez da urina 50% acima do padrão')
+    INTO clinica_medica_t_exame_clientes(id_cliente, id_cod_exame, data_exame, diagnostico_exame)
+    VALUES('04098916657',309,TO_DATE('07/06/2022 07:22:11','DD/MM/YYYY HH24:MI:SS'),'Rompimento do menisco frontal - lesão grau 3')
+    INTO clinica_medica_t_exame_clientes(id_cliente, id_cod_exame, data_exame, diagnostico_exame)
+    VALUES('05632147747',425,TO_DATE('15/08/2024 15:07:40','DD/MM/YYYY HH24:MI:SS'),'Insuficiencia cardiaca leve')
+    INTO clinica_medica_t_exame_clientes(id_cliente, id_cod_exame, data_exame, diagnostico_exame)
+    VALUES('05632147747',600,TO_DATE('01/02/2023 09:10:13','DD/MM/YYYY HH24:MI:SS'),'Nenhuma alteracao celular encontrada no tecido')
+    INTO clinica_medica_t_exame_clientes(id_cliente, id_cod_exame, data_exame, diagnostico_exame)
+    VALUES('33652012104',223,TO_DATE('02/12/2023 08:55:21','DD/MM/YYYY HH24:MI:SS'),'Nivel de progesterona dentro da normalidade')
+    INTO clinica_medica_t_exame_clientes(id_cliente, id_cod_exame, data_exame, diagnostico_exame)
+    VALUES('33652012104',225,TO_DATE('17/10/2024 11:13:30','DD/MM/YYYY HH24:MI:SS'),'Infeccao bacteriana - bacilo gonorreico')
+    INTO clinica_medica_t_exame_clientes(id_cliente, id_cod_exame, data_exame, diagnostico_exame)
+    VALUES('77475896320',309,TO_DATE('18/10/2023 16:22:12','DD/MM/YYYY HH24:MI:SS'),'Desvio de septo moderado na narina esquerda')
+    INTO clinica_medica_t_exame_clientes(id_cliente, id_cod_exame, data_exame, diagnostico_exame)
+    VALUES('77475896320',425,TO_DATE('18/10/2023 16:32:05','DD/MM/YYYY HH24:MI:SS'),'Nenhuma alteracao cardiaca identificada')
+    INTO clinica_medica_t_exame_clientes(id_cliente, id_cod_exame, data_exame, diagnostico_exame)
+    VALUES('22365250147',600,TO_DATE('11/04/2023 08:44:00','DD/MM/YYYY HH24:MI:SS'),'Contaminacao por fungo desconhecido')
+    SELECT * FROM dual; 
+
+INSERT INTO clinica_medica_t_exame_clientes(id_cliente, id_cod_exame, data_exame, diagnostico_exame)
+VALUES
+('04098916657', 223,TO_DATE('05/01/2023 10:15:00','DD/MM/YYYY HH24:MI:SS'),'Exame dentro dos parametros de normalidde.'),
+('04098916657', 225,TO_DATE('05/01/2023 10:15:00','DD/MM/YYYY HH24:MI:SS'),'Urina apresenta nivel elevado de ureia'),
+('04098916657', 309,TO_DATE('05/01/2023 10:15:00','DD/MM/YYYY HH24:MI:SS'),'Lesão identificada no menisco');
+
+('05632147747', 425,'05/01/2023 10:44:00','Altercao no ritmo cardiaco identificada apos exercicios fisicos na esteira'),
+('05632147747', 600,'05/01/2023 10:44:00','Nenhuma alteracao celular identificada na biopsia'),
+('12336547898', 223,'09/01/2024 09:01:53','Numero de hemacias 10% acima do valor padrão'),
+('78741452368', 225,'19/02/2024 16:55:01','Urina sem alterações identificadas'),
+('78741452368', 309,'11/03/2024 13:13:20','Nenhuma lesao identificada'),
+('78741452368', 425,'02/08/2021 08:10:47','Batimentos cardiacos normais'),
+('78741452368', 600,'04/09/2021 07:55:14','Tecido necrosado, recomenda-se extracao'),
+('01255478745', 223,'13/04/2023 08:21:21','Nível de leucócitos 35% acima do padrão'),
+('01255478745', 225,'19/05/2022 11:59:02','Infecçao bacteriana - estratocopus pujantis'),
+('63654598741', 309,'23/07/2023 13:21:44','Inflamação no tendão de aquiles - grau 2'),
+('05632147747', 425,'08/11/2024 10:00:00','Disritmia cardiaca grave'),
+('05632147747', 600,'08/11/2024 15:18:09','Tecido apresenta tumor benigno'),
+('63654598741', 223,'24/02/2023 12:49:30','Sangue do tipo B+, sem anormalidades identificadas'),
+('63654598741', 225,'24/02/2023 12:49:00','Nivel de acidez da urina 50% acima do padrão'),
+('04098916657', 309,'07/06/2022 07:22:11','Rompimento do menisco frontal - lesão grau 3'),
+('05632147747', 425,'15/08/2024 15:07:40','Insuficiencia cardiaca leve'),
+('05632147747', 600,'01/02/2023 09:10:13','Nenhuma alteracao celular encontrada no tecido'),
+('33652012104', 223,'02/12/2023 08:55:21','Nivel de progesterona dentro da normalidade'),
+('33652012104', 225,'17/10/2024 11:13:30','Infeccao bacteriana - bacilo gonorreico'),
+('77475896320', 309,'18/10/2023 16:22:12','Desvio de septo moderado na narina esquerda'),
+('77475896320', 425,'18/10/20237 16:32:05','Nenhuma alteracao cardiaca identificada'),
+('22365250147', 600,'11/04/2023 08:44:00','Contaminacao por fungo desconhecido');
+
+
+SELECT * FROM clinica_medica_t_exame_clientes
+commit;
