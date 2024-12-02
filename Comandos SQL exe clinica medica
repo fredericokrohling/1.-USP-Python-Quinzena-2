@@ -1,12 +1,12 @@
 --Exercicio clinica medica
+--Atalhos
+--CRTL + / = comenta a linha
+--CRTL + SPACEBAR = APOS iniciar a escrita do select, esse comando ira mostrar as tabelas disponiveis
 
 select * from clinica_medica_t_convenios;
 select * from clinica_medica_t_exames;
 select * from clinica_medica_t_clientes;
 select * from clinica_medica_t_exame_clientes;
-
---DROP TABLE mba_usp.clinica_medica_t_clientes;
-commit;
 
 CREATE SEQUENCE s_cod_convenios 
     MINVALUE 100
@@ -14,8 +14,6 @@ CREATE SEQUENCE s_cod_convenios
     START WITH 100
     INCREMENT BY 1
     CACHE 10;
-
-
 CREATE TABLE clinica_medica_t_convenios(
     id_cod_convenio integer PRIMARY KEY,
     cnpj_convenio number(14) not null,
@@ -25,16 +23,13 @@ CREATE TABLE clinica_medica_t_convenios(
     
     CONSTRAINT cons_nome_convenio unique(nome_convenio),
     CONSTRAINT cons_cnpj_convenio unique(cnpj_convenio)
-);
-   
+); 
 CREATE TABLE clinica_medica_t_exames(
     id_cod_exame number(4) PRIMARY KEY,
     tipo_exame char(15) not null,
     
-    CONSTRAINT cons_tipo_exame CHECK(tipo_exame in('sangue','imagem','urina',
-    'eletro','biopsia'))
-);    
-
+    CONSTRAINT cons_tipo_exame CHECK(tipo_exame in('sangue','imagem','urina','eletro','biopsia','raio-x'))
+);
 CREATE TABLE clinica_medica_t_clientes(
     id_cliente char(11) PRIMARY KEY,
     nome char(40) not null,
@@ -46,7 +41,6 @@ CREATE TABLE clinica_medica_t_clientes(
     CONSTRAINT fk_id_cod_convenio FOREIGN KEY (id_cod_convenio) 
     REFERENCES clinica_medica_t_convenios(id_cod_convenio) ON DELETE CASCADE
 );
-
 CREATE TABLE clinica_medica_t_exame_clientes(
     id_cod_exame number(4) not null,
     id_cliente char(11) not null,
@@ -59,28 +53,27 @@ CREATE TABLE clinica_medica_t_exame_clientes(
     REFERENCES clinica_medica_t_clientes(id_cliente) ON DELETE CASCADE
 );
 
-     
-    
-    INSERT ALL   
+--Para alterar a constraint a melhor abordagem eh dropar e criar novamente.
+ALTER TABLE clinica_medica_t_exames drop CONSTRAINT cons_tipo_exame; 
+COMMIT;
+ALTER TABLE clinica_medica_t_exames ADD CONSTRAINT cons_tipo_exame CHECK(tipo_exame in('sangue','imagem','urina','eletro','biopsia','raio-x'));
+commit;       
+INSERT ALL   
         INTO clinica_medica_t_convenios(id_cod_convenio, cnpj_convenio, nome_convenio, nome_resp_conv, tel_resp_conv) 
         VALUES(s_cod_convenios.nextval,74566320001133,'Hapvida','Zeca Soares','312237702')
-        SELECT * FROM dual;
-    
-    INSERT ALL  
+        SELECT * FROM dual; 
+INSERT ALL  
         INTO clinica_medica_t_convenios(id_cod_convenio, cnpj_convenio, nome_convenio, nome_resp_conv, tel_resp_conv) 
         VALUES(s_cod_convenios.nextval,10239980001754,'Bradesco Saude','Josenilton de Paula','217107844')
-        SELECT * FROM dual;
-    
-    INSERT ALL  
+        SELECT * FROM dual;  
+INSERT ALL  
         INTO clinica_medica_t_convenios(id_cod_convenio, cnpj_convenio, nome_convenio, nome_resp_conv, tel_resp_conv) 
         VALUES(s_cod_convenios.nextval,45789910001221,'Unimed-BH','Fernanda Assumpcao','31984040686')
         SELECT * FROM dual;
-    
-    INSERT ALL
+INSERT ALL
         INTO clinica_medica_t_convenios(id_cod_convenio, cnpj_convenio, nome_convenio, nome_resp_conv, tel_resp_conv) 
         VALUES(s_cod_convenios.nextval,36521420001448,'MedCenter','Johnson Torres','31991356900')
         SELECT * FROM dual;
-
 INSERT ALL -- T_clientes
     INTO clinica_medica_t_clientes(id_cliente, nome, telefone, endereco, id_cod_convenio)
     VALUES ('04098916657','Amanda Rios','3142177389','Avenida Afonso Pena, 155',108)
@@ -100,16 +93,14 @@ INSERT ALL -- T_clientes
     VALUES('77475896320','Joanna Fohm','3141217789','Avenida Getulio Vargas, 1955',112)
     INTO clinica_medica_t_clientes(id_cliente, nome, telefone, endereco, id_cod_convenio)
     VALUES('22365250147','Euripedes Casera','3141217789','Rua Darcy Ribeiro, 300',108)
-SELECT * FROM dual;
-    
+SELECT * FROM dual;    
 INSERT ALL -- T_exames
     INTO clinica_medica_t_exames (id_cod_exame, tipo_exame) VALUES (223, 'sangue')
     INTO clinica_medica_t_exames (id_cod_exame, tipo_exame) VALUES(225, 'urina')
     INTO clinica_medica_t_exames (id_cod_exame, tipo_exame) VALUES(309, 'imagem')
     INTO clinica_medica_t_exames (id_cod_exame, tipo_exame) VALUES(425, 'eletro')
     INTO clinica_medica_t_exames (id_cod_exame, tipo_exame) VALUES(600, 'biopsia')
-SELECT * FROM dual;
-    
+SELECT * FROM dual;    
 INSERT ALL -- T_exame_cliente
     INTO clinica_medica_t_exame_clientes(id_cliente, id_cod_exame, data_exame, diagnostico_exame)
     VALUES('04098916657',223,TO_DATE('05/01/2023 10:15:00','DD/MM/YYYY HH24:MI:SS'), 'Exame dentro dos parametros de normalidde.')
@@ -162,13 +153,29 @@ INSERT ALL -- T_exame_cliente
     INTO clinica_medica_t_exame_clientes(id_cliente, id_cod_exame, data_exame, diagnostico_exame)
     VALUES('22365250147',600,TO_DATE('11/04/2023 08:44:00','DD/MM/YYYY HH24:MI:SS'),'Contaminacao por fungo desconhecido')
     SELECT * FROM dual; 
-
+    
+INSERT ALL
+    INTO clinica_medica_t_exame_clientes(id_cliente, id_cod_exame, data_exame, diagnostico_exame)
+    VALUES('77475896320',309,TO_DATE('18/10/2023 16:32:12','DD/MM/YYYY HH24:MI:SS'),'Sinos nasais apresentam inchaço')
+    INTO clinica_medica_t_exame_clientes(id_cliente, id_cod_exame, data_exame, diagnostico_exame)
+    VALUES('77475896320',425,TO_DATE('18/10/2023 16:42:35','DD/MM/YYYY HH24:MI:SS'),'Valvulas cardiacas em perfeito funcionamento')
+    INTO clinica_medica_t_exame_clientes(id_cliente, id_cod_exame, data_exame, diagnostico_exame)
+    VALUES('22365250147',600,TO_DATE('11/04/2023 08:30:20','DD/MM/YYYY HH24:MI:SS'),'Contaminacao por micose superficial')
+    INTO clinica_medica_t_exame_clientes(id_cliente, id_cod_exame, data_exame, diagnostico_exame)
+    VALUES('63654598741',223,TO_DATE('24/02/2023 12:51:30','DD/MM/YYYY HH24:MI:SS'),'Nives de testoterona normais')
+    INTO clinica_medica_t_exame_clientes(id_cliente, id_cod_exame, data_exame, diagnostico_exame)
+    VALUES('63654598741',225,TO_DATE('24/02/2023 12:51:00','DD/MM/YYYY HH24:MI:SS'),'Baixo nivel de sais minerais')
+    INTO clinica_medica_t_exame_clientes(id_cliente, id_cod_exame, data_exame, diagnostico_exame)
+    VALUES('04098916657',309,TO_DATE('07/06/2022 07:24:11','DD/MM/YYYY HH24:MI:SS'),'Presença de liquido na cavidade')
+    INTO clinica_medica_t_exame_clientes(id_cliente, id_cod_exame, data_exame, diagnostico_exame)
+    VALUES('05632147747',425,TO_DATE('15/08/2024 15:09:40','DD/MM/YYYY HH24:MI:SS'),'Presença de obstrucao parcial na aorta')
+    SELECT * FROM dual; 
+    
 INSERT INTO clinica_medica_t_exame_clientes(id_cliente, id_cod_exame, data_exame, diagnostico_exame)
 VALUES
 ('04098916657', 223,TO_DATE('05/01/2023 10:15:00','DD/MM/YYYY HH24:MI:SS'),'Exame dentro dos parametros de normalidde.'),
 ('04098916657', 225,TO_DATE('05/01/2023 10:15:00','DD/MM/YYYY HH24:MI:SS'),'Urina apresenta nivel elevado de ureia'),
-('04098916657', 309,TO_DATE('05/01/2023 10:15:00','DD/MM/YYYY HH24:MI:SS'),'Lesão identificada no menisco');
-
+('04098916657', 309,TO_DATE('05/01/2023 10:15:00','DD/MM/YYYY HH24:MI:SS'),'Lesão identificada no menisco'),
 ('05632147747', 425,'05/01/2023 10:44:00','Altercao no ritmo cardiaco identificada apos exercicios fisicos na esteira'),
 ('05632147747', 600,'05/01/2023 10:44:00','Nenhuma alteracao celular identificada na biopsia'),
 ('12336547898', 223,'09/01/2024 09:01:53','Numero de hemacias 10% acima do valor padrão'),
@@ -189,9 +196,61 @@ VALUES
 ('33652012104', 223,'02/12/2023 08:55:21','Nivel de progesterona dentro da normalidade'),
 ('33652012104', 225,'17/10/2024 11:13:30','Infeccao bacteriana - bacilo gonorreico'),
 ('77475896320', 309,'18/10/2023 16:22:12','Desvio de septo moderado na narina esquerda'),
-('77475896320', 425,'18/10/20237 16:32:05','Nenhuma alteracao cardiaca identificada'),
+('77475896320', 425,'18/10/2023 16:32:05','Nenhuma alteracao cardiaca identificada'),
 ('22365250147', 600,'11/04/2023 08:44:00','Contaminacao por fungo desconhecido');
 
+-- Consultas
+SELECT cliente.nome, conv.nome_convenio, exames.tipo_exame, exame_cli.diagnostico_exame, exame_cli.data_exame
+FROM clinica_medica_t_clientes cliente 
+INNER JOIN clinica_medica_t_exame_clientes exame_cli
+ON cliente.id_cliente = exame_cli.id_cliente
+INNER JOIN clinica_medica_t_convenios conv
+ON conv.id_cod_convenio = cliente.id_cod_convenio
+INNER JOIN clinica_medica_t_exames exames
+ON exames.id_cod_exame = exame_cli.id_cod_exame;
 
-SELECT * FROM clinica_medica_t_exame_clientes
-commit;
+SELECT c.nome as "Nome Cliente", c.telefone as "Telefone Cliente", conv.nome_convenio as "Nome Convenio", 
+conv.nome_resp_conv as "Nome do Resp. do Convenio", exacli.diagnostico_exame as Diagnostico, 
+tipex.tipo_exame as "Tipo do Exame"
+FROM clinica_medica_t_clientes c
+INNER JOIN clinica_medica_t_exame_clientes exacli
+ON c.id_cliente = exacli.id_cliente
+INNER JOIN clinica_medica_t_exames tipex
+ON exacli.id_cod_exame = tipex.id_cod_exame 
+INNER JOIN clinica_medica_t_convenios conv
+ON conv.id_cod_convenio = c.id_cod_convenio;
+
+SELECT c.nome as "Nome Cliente", to_char(data_exame, 'Mon-YY') as "Mes Ano do Exame", c.telefone, conv.nome_convenio as "Nome do Convenio", 
+conv.nome_resp_conv as "Nome do Responsavel pelo Convenio", exacli.diagnostico_exame as "Resultado do Exame", 
+tipex.tipo_exame
+FROM clinica_medica_t_clientes c
+INNER JOIN clinica_medica_t_exame_clientes exacli
+ON c.id_cliente = exacli.id_cliente
+INNER JOIN clinica_medica_t_convenios conv
+ON conv.id_cod_convenio = c.id_cod_convenio
+INNER JOIN clinica_medica_t_exames tipex
+ON exacli.id_cod_exame = tipex.id_cod_exame
+order by 1;
+
+-- ASSIM FORMATO UMA DATA exibindo horario
+SELECT to_char(data_exame, 'MM/DD/YY HH:MI:SS') from clinica_medica_t_exame_clientes;
+SELECT to_char(data_exame, 'DD') from clinica_medica_t_exame_clientes;
+SELECT to_char(data_exame, 'MM/DD/YY') from clinica_medica_t_exame_clientes;
+
+-- SUB queries
+--Selecionar o cliente com os exames mais recentes
+
+-- ALTERAR DADOS DAS TABLES - UPDATE
+Select * from clinica_medica_t_convenios;
+Update clinica_medica_t_convenios set nome_resp_conv = 'William Dafoe' where id_cod_convenio = 108;
+
+--ALTERAR CONSTRAINT
+--apaguei e recriei outra ajustada.
+INSERT INTO clinica_medica_t_exames (id_cod_exame, tipo_exame) VALUES (749, 'raio-x');
+
+--having e group by
+Select to_char(data_exame, 'DD/MM/YY') as "Data Exame", count(data_exame) as "Qtd." 
+from clinica_medica_t_exame_clientes 
+group by to_char(data_exame, 'DD/MM/YY') 
+having count(data_exame) >= 2
+order by "Qtd." desc;
